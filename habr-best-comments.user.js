@@ -19,13 +19,12 @@ $(function($){
 	var _bgColorSelected = '#3D438D';
 
 
-	var authorName = $.trim($('.author a').text());
+	var authorName = $.trim($('.author a:first').text());
 	
 	
-	var allComments = GetAllComments();	
+	var allComments = GetAllComments();
 	ShowComments(allComments);
 	
-
 
 	
 	function GetAllComments()
@@ -33,13 +32,13 @@ $(function($){
 		var allComments = [];
 		$('.comment_item').each(function(index, item){
 			var id = $(item).attr('id');
-			var markItem = $('> .info > .voting > .mark', item);
-			var isNew = $('> .info', item).hasClass('is_new');
-			var userName = $.trim($('> .info .username', item).text());
+			var markItem = $('> .comment_body > .info > .voting > .mark', item);
+			var isNew = $('> .comment_body > .info', item).hasClass('is_new');
+			var userName = $.trim($('> .comment_body > .info .username', item).text());
 			var mark = parseInt(markItem.text().match(/\d+/));
 			if (markItem.hasClass('negative'))
 				mark = -mark;
-			var hasImg = $('> .message', item).find('img').length > 0;
+			var hasImg = $('> .comment_body > .message', item).find('img').length > 0;
 			
 			allComments.push(
 			{
@@ -65,7 +64,7 @@ $(function($){
 	
 	function ShowComments(comments)
 	{
-		var wnd = $('<div class="hbc" style="width: 60px; top: 55px; bottom: 10px; right: 32px; overflow: auto; position: fixed;"></div>');
+		var wnd = $('<div class="hbc" style="width: 70px; top: 55px; bottom: 10px; right: 32px; overflow: auto; position: fixed;"></div>');
 		$(wnd).css('background-color', _bgColor);
 		$('body').append(wnd);
 		$.each(comments, function(index, comment) {
