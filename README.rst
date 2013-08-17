@@ -18,8 +18,11 @@
 ========
 
 Необходимо установить в браузер в каестве юзер-скрипта.
+
 Firefox - через `Greasemonkey <https://addons.mozilla.org/en-US/firefox/addon/greasemonkey>`_.
+
 Chrome - через `Tampermonkey <https://chrome.google.com/webstore/detail/tampermonkey/dhdgffkkebhmkfjojejmpbldmpobfkfo>`_.
+
 Opera 15+ - через `Tampermonkey <https://chrome.google.com/webstore/detail/tampermonkey/dhdgffkkebhmkfjojejmpbldmpobfkfo>`_ (разрешить установку расширений из галереи Chrome'а можно установкой расширения `Download Chrome Extension <https://addons.opera.com/en/extensions/details/download-chrome-extension-9>`_).
 
 ========
