@@ -71,7 +71,7 @@ $(function($){
 			// create item
 			var item = $('<div class="hbc__item" style="text-align: right;"><a href="#">0</a></div>');
 			$('a', item).attr('href', '#' + comment.id);
-			$('a', item).text(comment.mark >= 0 ? '+'+comment.mark : comment.mark);
+			$('a', item).text(isNaN(comment.mark) ? '?' : (comment.mark >= 0 ? '+'+comment.mark : comment.mark));
 			
 			// mark color
 			if (comment.mark >= 0)
