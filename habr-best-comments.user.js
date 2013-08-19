@@ -4,7 +4,7 @@
 // @include     http://habrahabr.ru/post/*
 // @include     http://habrahabr.ru/company/*
 // @grant       none
-// @version     0.1
+// @version     0.1.1
 // ==/UserScript==
 
 
@@ -20,12 +20,42 @@ $(function($){
 
 
 	var authorName = $.trim($('.author a:first').text());
-	
-	
-	var allComments = GetAllComments();
-	ShowComments(allComments);
+	ShowCommentsPanel();
 	
 
+	// update button
+	$('a.refresh').click(function()
+	{
+		$('.hbc').remove();
+		setTimeout(function()
+		{
+			WaitForCommentsWillBeLoadedAndUpdateComments();
+		}, 500);
+
+		function WaitForCommentsWillBeLoadedAndUpdateComments()
+		{
+			if ($('a.refresh').hasClass('loading'))
+			{
+				// wait till update end
+				setTimeout(WaitForCommentsWillBeLoadedAndUpdateComments, 100);
+			}
+			else
+			{
+				// update comments
+				ShowCommentsPanel();
+			}
+		}
+	});	
+
+
+
+	function ShowCommentsPanel()
+	{
+        console.log('ShowCommentsPanel - start');
+		var allComments = GetAllComments();
+		ShowComments(allComments);
+        console.log('ShowCommentsPanel - end');
+	}
 	
 	function GetAllComments()
 	{
