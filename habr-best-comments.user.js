@@ -4,7 +4,7 @@
 // @include     http://habrahabr.ru/post/*
 // @include     http://habrahabr.ru/company/*
 // @grant       none
-// @version     0.1.1
+// @version     0.1.2
 // ==/UserScript==
 
 
@@ -78,7 +78,18 @@ $(function($){
 			});
 		});
 		
-		// best desc, time asc
+
+		// remove comments without mark
+		allComments = allComments.reduce(function(prev, cur)
+		{
+			if (!isNaN(cur.mark))
+			{
+				prev.push(cur);
+			}
+			return prev;
+		}, []);
+
+		// best desc, time asc		
 		allComments.sort(function(a, b) {
 			return a.mark == b.mark
 				? (a.id < b.id ? 1 : -1)
