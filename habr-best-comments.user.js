@@ -51,10 +51,8 @@ $(function($){
 
 	function ShowCommentsPanel()
 	{
-        console.log('ShowCommentsPanel - start');
 		var allComments = GetAllComments();
 		ShowComments(allComments);
-        console.log('ShowCommentsPanel - end');
 	}
 	
 	function GetAllComments()
