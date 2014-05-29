@@ -4,11 +4,18 @@
 // @include     http://habrahabr.ru/post/*
 // @include     http://habrahabr.ru/company/*
 // @grant       none
-// @version     0.1.2
+// @run-at      document-start
+// @version     0.1.3
 // ==/UserScript==
 
 
-$(function($){
+// fix blocked broken ads
+if (typeof unsafeWindow.adriver == "undefined") {
+	unsafeWindow.adriver = function () { }
+}
+
+
+window.addEventListener('load', function () {
 	// options
 	var _fgAuthor = '#F76D59';
 	var _bgAuthor = '#FFAA9D';
@@ -21,44 +28,37 @@ $(function($){
 
 	var authorName = $.trim($('.author a:first').text());
 	ShowCommentsPanel();
-	
+
 
 	// update button
-	$('a.refresh').click(function()
-	{
+	$('a.refresh').click(function () {
 		$('.hbc').remove();
-		setTimeout(function()
-		{
+		setTimeout(function () {
 			WaitForCommentsWillBeLoadedAndUpdateComments();
 		}, 500);
 
-		function WaitForCommentsWillBeLoadedAndUpdateComments()
-		{
-			if ($('a.refresh').hasClass('loading'))
-			{
+		function WaitForCommentsWillBeLoadedAndUpdateComments() {
+			if ($('a.refresh').hasClass('loading')) {
 				// wait till update end
 				setTimeout(WaitForCommentsWillBeLoadedAndUpdateComments, 100);
 			}
-			else
-			{
+			else {
 				// update comments
 				ShowCommentsPanel();
 			}
 		}
-	});	
+	});
 
 
 
-	function ShowCommentsPanel()
-	{
+	function ShowCommentsPanel() {
 		var allComments = GetAllComments();
 		ShowComments(allComments);
 	}
-	
-	function GetAllComments()
-	{
+
+	function GetAllComments() {
 		var allComments = [];
-		$('.comment_item').each(function(index, item){
+		$('.comment_item').each(function (index, item) {
 			var id = $(item).attr('id');
 			var markItem = $('> .comment_body > .info > .voting > .mark', item);
 			var isNew = $('> .comment_body > .info', item).hasClass('is_new');
@@ -67,7 +67,7 @@ $(function($){
 			if (markItem.hasClass('negative'))
 				mark = -mark;
 			var hasImg = $('> .comment_body > .message', item).find('img').length > 0;
-			
+
 			allComments.push(
 			{
 				id: id,
@@ -77,77 +77,70 @@ $(function($){
 				hasImg: hasImg
 			});
 		});
-		
+
 
 		// remove comments without mark
-		allComments = allComments.reduce(function(prev, cur)
-		{
-			if (!isNaN(cur.mark))
-			{
+		allComments = allComments.reduce(function (prev, cur) {
+			if (!isNaN(cur.mark)) {
 				prev.push(cur);
 			}
 			return prev;
 		}, []);
 
 		// best desc, time asc		
-		allComments.sort(function(a, b) {
+		allComments.sort(function (a, b) {
 			return a.mark == b.mark
 				? (a.id < b.id ? 1 : -1)
 				: ((isNaN(a.mark) ? 0 : a.mark) > (isNaN(b.mark) ? 0 : b.mark) ? 1 : -1)
 		});
 		allComments.reverse();
-		
+
 		return allComments;
 	}
-	
-	
-	function ShowComments(comments)
-	{
+
+
+	function ShowComments(comments) {
 		var wnd = $('<div class="hbc" style="width: 70px; top: 55px; bottom: 10px; right: 32px; overflow: auto; position: fixed;"></div>');
 		$(wnd).css('background-color', _bgColor);
 		$('body').append(wnd);
-		$.each(comments, function(index, comment) {
+		$.each(comments, function (index, comment) {
 			// create item
 			var item = $('<div class="hbc__item" style="text-align: right;"><a href="#">0</a></div>');
 			$('a', item).attr('href', '#' + comment.id);
-			$('a', item).text(isNaN(comment.mark) ? '?' : (comment.mark >= 0 ? '+'+comment.mark : comment.mark));
-			
+			$('a', item).text(isNaN(comment.mark) ? '?' : (comment.mark >= 0 ? '+' + comment.mark : comment.mark));
+
 			// mark color
 			if (comment.mark >= 0)
 				$('a', item).css('color', _fgPositiveMark);
 			else
 				$('a', item).css('color', _fgNegativeMark);
-			
-			if (comment.isAuthor)
-			{
+
+			if (comment.isAuthor) {
 				$('a', item).before('<span style="color: ' + _fgAuthor + '; font-weight: bold;">A </span>');
 			}
-			if (comment.hasImg)
-			{
+			if (comment.hasImg) {
 				$('a', item).before('<span style="color: blue; font-weight: bold;">i </span>');
 			}
-				
-				
+
+
 			// bg color
-			if (comment.isNew)
-			{
+			if (comment.isNew) {
 				$(item).addClass('hbc__item-when-new');
 				$(item).css('background-color', _bgColorNew);
 			}
-			
+
 			// onclick event
 			$(item).bind('click', Comment_OnClick);
-			
+
 			// add item
 			$(wnd).append(item);
 		});
-		
+
 		// highlight author name
 		$('a.username:contains("' + authorName + '")').css('background-color', _bgAuthor);
 	}
-	
-	function Comment_OnClick()
-	{
+
+	function Comment_OnClick() {
 		$('.hbc__item').css('background-color', _bgColor);
 		$('.hbc__item-when-new').css('background-color', _bgColorNew);
 		$(this).css('background-color', _bgColorSelected);
