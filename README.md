@@ -22,4 +22,4 @@ Opera 15+ - через [Tampermonkey](https://chrome.google.com/webstore/detail/
 
 # Скачать
 
-[habr-best-comments.user.js](https://bitbucket.org/liiws/habr-best-comments/downloads/habr-best-comments.user.js?pk=374910).
+[habr-best-comments.user.js](https://bitbucket.org/liiws/habr-best-comments/downloads/habr-best-comments.user.js).
