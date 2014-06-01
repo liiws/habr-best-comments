@@ -10,9 +10,14 @@
 
 
 // fix blocked broken ads
-if (typeof unsafeWindow.adriver == "undefined") {
-	unsafeWindow.adriver = function () { }
-}
+(function(){
+	// native userscript support
+	var wnd = typeof unsafeWindow == "undefined" ? window : unsafeWindow;
+
+	if (typeof wnd.adriver == "undefined") {
+		wnd.adriver = function () { }
+	}
+})();
 
 
 window.addEventListener('load', function () {
