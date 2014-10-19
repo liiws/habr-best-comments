@@ -3,17 +3,17 @@
 // @namespace   http://habrahabr.ru
 // @include     http://habrahabr.ru/post/*
 // @include     http://habrahabr.ru/company/*
+// @include     http://geektimes.ru/post/*
+// @include     http://geektimes.ru/company/*
 // @grant       none
 // @run-at      document-start
-// @version     0.1.3
+// @version     0.1.4
 // ==/UserScript==
 
 
 // fix blocked broken ads
 (function(){
-	// native userscript support
 	var wnd = typeof unsafeWindow == "undefined" ? window : unsafeWindow;
-
 	if (typeof wnd.adriver == "undefined") {
 		wnd.adriver = function () { }
 	}
