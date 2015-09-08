@@ -9,7 +9,7 @@
 // @include     http://geektimes.ru/article/*
 // @grant       none
 // @run-at      document-start
-// @version     0.1.6
+// @version     0.1.7
 // @downloadURL https://bitbucket.org/liiws/habr-best-comments/downloads/habr-best-comments.user.js
 // @updateURL   https://bitbucket.org/liiws/habr-best-comments/downloads/habr-best-comments.meta.js
 // ==/UserScript==
@@ -35,7 +35,7 @@ window.addEventListener('load', function () {
 	var _bgColorSelected = '#3D438D';
 
 
-	var authorName = $.trim($('.author a:first').text());
+	var authorName = $.trim($('.author-info__nickname:first').text()).substr(1);
 	ShowCommentsPanel();
 
 
