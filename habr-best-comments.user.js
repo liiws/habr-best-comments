@@ -9,7 +9,7 @@
 // @include     http://geektimes.ru/article/*
 // @grant       none
 // @run-at      document-start
-// @version     0.1.10
+// @version     0.1.11
 // @downloadURL https://bitbucket.org/liiws/habr-best-comments/downloads/habr-best-comments.user.js
 // @updateURL   https://bitbucket.org/liiws/habr-best-comments/downloads/habr-best-comments.meta.js
 // ==/UserScript==
@@ -35,7 +35,10 @@ window.addEventListener('load', function () {
 	var _bgColorSelected = '#3D438D';
 
 
-	var authorElement = $(".author-info__name");
+	var authorElement = $(".post-type__value.post-type__value_author");
+	if (authorElement.length == 0) {
+		authorElement = $(".author-info__name");
+	}
 	if (authorElement.length == 0) {
 		authorElement = $(".author-info__nickname");
 	}
