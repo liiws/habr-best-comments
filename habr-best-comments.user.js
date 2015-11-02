@@ -42,7 +42,6 @@ window.addEventListener('load', function () {
 	if (authorElement.length == 0) {
 		authorElement = $(".author-info__nickname:last");
 	}
-alert(authorElement);
 	var authorName = authorElement.length == 0 ? "" : authorElement.attr("href").split("/").pop();
 	
 	ShowCommentsPanel();
