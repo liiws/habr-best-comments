@@ -9,7 +9,7 @@
 // @include     http://geektimes.ru/article/*
 // @grant       none
 // @run-at      document-start
-// @version     0.1.12
+// @version     0.1.13
 // @downloadURL https://bitbucket.org/liiws/habr-best-comments/downloads/habr-best-comments.user.js
 // @updateURL   https://bitbucket.org/liiws/habr-best-comments/downloads/habr-best-comments.meta.js
 // ==/UserScript==
@@ -77,11 +77,11 @@ window.addEventListener('load', function () {
 		var allComments = [];
 		$('.comment_item').each(function (index, item) {
 			var id = $(item).attr('id');
-			var markItem = $('> .comment_body > .info > .voting > .mark', item);
+			var markItem = $('> .comment_body > .info > .js-voting > .js-mark', item);
 			var isNew = $('> .comment_body > .info', item).hasClass('is_new');
-			var userName = $.trim($('> .comment_body > .info .username', item).text());
+			var userName = $.trim($('> .comment_body > .info .comment-item__username', item).text());
 			var mark = parseInt(markItem.text().match(/\d+/));
-			if (markItem.hasClass('negative'))
+			if (markItem.hasClass('voting-wjt__counter_negative'))
 				mark = -mark;
 			var hasImg = $('> .comment_body > .message', item).find('img').length > 0;
 
@@ -154,7 +154,7 @@ window.addEventListener('load', function () {
 		});
 
 		// highlight author name
-		$('a.username:contains("' + authorName + '")').css('background-color', _bgAuthor);
+		$('a.comment-item__username:contains("' + authorName + '")').css('background-color', _bgAuthor);
 	}
 
 	function Comment_OnClick() {
