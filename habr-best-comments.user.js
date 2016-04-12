@@ -15,7 +15,7 @@
 // @include     https://geektimes.ru/article/*
 // @grant       none
 // @run-at      document-start
-// @version     0.1.14
+// @version     0.2
 // @downloadURL https://bitbucket.org/liiws/habr-best-comments/downloads/habr-best-comments.user.js
 // @updateURL   https://bitbucket.org/liiws/habr-best-comments/downloads/habr-best-comments.meta.js
 // ==/UserScript==
@@ -83,11 +83,19 @@ window.addEventListener('load', function () {
 		var allComments = [];
 		$('.comment_item').each(function (index, item) {
 			var id = $(item).attr('id');
-			var markItem = $('> .comment_body > .info > .js-voting > .js-mark', item);
+			var markItemWrapper = $('> .comment_body > .info > .js-voting > .js-mark', item);
+			var markItem = $('> .js-score', markItemWrapper);
+			var markTitle = markItem.attr('title');
+			var plus = 0;
+			var minus = 0;
+			if (markTitle && markTitle.length > 0) {
+				plus = +markTitle.match(/↑(\d+)/)[1];
+				minus = +markTitle.match(/↓(\d+)/)[1];
+			}
 			var isNew = $('> .comment_body > .info', item).hasClass('is_new');
 			var userName = $.trim($('> .comment_body > .info .comment-item__username', item).text());
 			var mark = parseInt(markItem.text().match(/\d+/));
-			if (markItem.hasClass('voting-wjt__counter_negative'))
+			if (markItemWrapper.hasClass('voting-wjt__counter_negative'))
 				mark = -mark;
 			var hasImg = $('> .comment_body > .message', item).find('img').length > 0;
 
@@ -97,7 +105,10 @@ window.addEventListener('load', function () {
 				mark: mark,
 				isNew: isNew,
 				isAuthor: userName == authorName,
-				hasImg: hasImg
+				hasImg: hasImg,
+				plus: plus,
+				minus: minus,
+				markItemWrapper: markItemWrapper
 			});
 		});
 
@@ -127,6 +138,9 @@ window.addEventListener('load', function () {
 		$(wnd).css('background-color', _bgColor);
 		$('body').append(wnd);
 		$.each(comments, function (index, comment) {
+			
+			// right panel
+			
 			// create item
 			var item = $('<div class="hbc__item" style="text-align: right;"><a href="#">0</a></div>');
 			$('a', item).attr('href', '#' + comment.id);
@@ -145,7 +159,6 @@ window.addEventListener('load', function () {
 				$('a', item).before('<span style="color: blue; font-weight: bold;">i </span>');
 			}
 
-
 			// bg color
 			if (comment.isNew) {
 				$(item).addClass('hbc__item-when-new');
@@ -157,6 +170,16 @@ window.addEventListener('load', function () {
 
 			// add item
 			$(wnd).append(item);
+			
+			
+			// add plus/minus to the comment mark
+			
+			if (comment.plus > 0 && comment.minus > 0) {
+				var markItemWrapper = comment.markItemWrapper;
+				item = $('<div class="hbc__mark-add" style="font-weight: bold; line-height: 6px; opacity: 0.4;"><span style="color: ' + _fgPositiveMark + ';">+' + comment.plus + '</span> <span style="color: ' + _fgNegativeMark + ';">-' + comment.minus + '</span></div>');				
+				markItemWrapper.append(item);
+			}
+			
 		});
 
 		// highlight author name
