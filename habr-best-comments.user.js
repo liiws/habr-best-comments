@@ -15,7 +15,7 @@
 // @include     https://geektimes.ru/article/*
 // @grant       none
 // @run-at      document-start
-// @version     0.2
+// @version     0.2.1
 // @downloadURL https://bitbucket.org/liiws/habr-best-comments/downloads/habr-best-comments.user.js
 // @updateURL   https://bitbucket.org/liiws/habr-best-comments/downloads/habr-best-comments.meta.js
 // ==/UserScript==
@@ -176,6 +176,7 @@ window.addEventListener('load', function () {
 			
 			if (comment.plus > 0 && comment.minus > 0) {
 				var markItemWrapper = comment.markItemWrapper;
+				markItemWrapper.find('.hbc__mark-add').remove();
 				item = $('<div class="hbc__mark-add" style="font-weight: bold; line-height: 6px; opacity: 0.4;"><span style="color: ' + _fgPositiveMark + ';">+' + comment.plus + '</span> <span style="color: ' + _fgNegativeMark + ';">-' + comment.minus + '</span></div>');				
 				markItemWrapper.append(item);
 			}
