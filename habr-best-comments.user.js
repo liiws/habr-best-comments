@@ -134,7 +134,7 @@ window.addEventListener('load', function () {
 
 
 	function ShowComments(comments) {
-		var wnd = $('<div class="hbc" style="width: 70px; top: 55px; bottom: 10px; right: 32px; overflow: auto; position: fixed;"></div>');
+		var wnd = $('<div class="hbc" style="width: 70px; top: 55px; bottom: 10px; right: 32px; overflow: auto; position: fixed; z-index: 2;"></div>');
 		$(wnd).css('background-color', _bgColor);
 		$('body').append(wnd);
 		$.each(comments, function (index, comment) {
