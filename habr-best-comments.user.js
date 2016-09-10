@@ -15,7 +15,7 @@
 // @include     https://geektimes.ru/article/*
 // @grant       none
 // @run-at      document-start
-// @version     0.2.3
+// @version     0.3
 // @downloadURL https://bitbucket.org/liiws/habr-best-comments/downloads/habr-best-comments.user.js
 // @updateURL   https://bitbucket.org/liiws/habr-best-comments/downloads/habr-best-comments.meta.js
 // ==/UserScript==
@@ -39,6 +39,8 @@ window.addEventListener('load', function () {
 	var _bgColor = '#F8F8F8';
 	var _bgColorNew = '#E8E8FF';
 	var _bgColorSelected = '#3D438D';
+	var _highlightIntervalMs = 1200;
+	var _scrollTopOffsetPc = 0.2;
 
 
 	var authorElement = $(".post-type__value.post-type__value_author");
@@ -142,9 +144,10 @@ window.addEventListener('load', function () {
 			// right panel
 			
 			// create item
-			var item = $('<div class="hbc__item" style="text-align: right;"><a href="#">0</a></div>');
-			$('a', item).attr('href', '#' + comment.id);
+			var item = $('<div class="hbc__item" style="text-align: right;"><a href="#" onclick="return false">0</a></div>');
+			//$('a', item).attr('href', '#' + comment.id);
 			$('a', item).text(isNaN(comment.mark) ? '?' : (comment.mark >= 0 ? '+' + comment.mark : comment.mark));
+			$('a', item).attr('iid', comment.id);
 
 			// mark color
 			if (comment.mark >= 0)
@@ -191,7 +194,35 @@ window.addEventListener('load', function () {
 		$('.hbc__item').css('background-color', _bgColor);
 		$('.hbc__item-when-new').css('background-color', _bgColorNew);
 		$(this).css('background-color', _bgColorSelected);
-		// go to url before browser "A" to emulate click at "A" to times. Habr has bug - click on "A" first time after page opening goes to wrong comment.
-		document.location = $(this).find('a').attr('href');
+		// go to url before browser "A" to emulate click at "A" two times. Habr has bug - click on "A" first time after page opening goes to wrong comment.
+		//document.location = $(this).find('a').attr('href');
+		
+		// scroll to comment
+		var id = $(this).find('a').attr('iid');
+		var commentElement = document.getElementById(id);
+		var elementPosition = GetElementPosition(commentElement);
+		var viewHeight = Math.max(document.documentElement.clientHeight, window.innerHeight || 0);
+		window.scrollTo(0, elementPosition.top - viewHeight*_scrollTopOffsetPc);
+		
+		// highlight comment
+		var commentBody = $(commentElement).find("> .comment_body");
+		commentBody.effect("highlight", {}, _highlightIntervalMs);
 	}
+	
+  function GetElementPosition(elem) {
+    var body = document.body;
+    var docEl = document.documentElement;
+
+    var scrollTop = window.pageYOffset || docEl.scrollTop || body.scrollTop;
+    var scrollLeft = window.pageXOffset || docEl.scrollLeft || body.scrollLeft;
+
+    var clientTop = docEl.clientTop || body.clientTop || 0;
+    var clientLeft = docEl.clientLeft || body.clientLeft || 0;
+
+    var box = elem.getBoundingClientRect();
+    var top  = box.top +  scrollTop - clientTop;
+    var left = box.left + scrollLeft - clientLeft;
+
+    return { top: Math.round(top), left: Math.round(left) };
+  }
 });
