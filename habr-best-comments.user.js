@@ -15,7 +15,7 @@
 // @include     https://geektimes.ru/article/*
 // @grant       none
 // @run-at      document-start
-// @version     0.3.3
+// @version     0.3.4
 // @downloadURL https://bitbucket.org/liiws/habr-best-comments/downloads/habr-best-comments.user.js
 // @updateURL   https://bitbucket.org/liiws/habr-best-comments/downloads/habr-best-comments.meta.js
 // ==/UserScript==
@@ -140,7 +140,7 @@ window.addEventListener('load', function () {
 
 
 	function ShowComments(comments) {
-		var wnd = $('<div class="hbc" style="width: 70px; top: 55px; bottom: 10px; right: 32px; overflow: auto; position: fixed; z-index: 2;"></div>');
+		var wnd = $('<div class="hbc" style="width: 80px; top: 55px; bottom: 10px; right: 32px; overflow: auto; position: fixed; z-index: 999;"></div>');
 		$(wnd).css('background-color', _bgColor);
 		$('body').append(wnd);
 		$.each(comments, function (index, comment) {
