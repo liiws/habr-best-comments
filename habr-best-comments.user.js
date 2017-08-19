@@ -15,7 +15,7 @@
 // @include     https://geektimes.ru/article/*
 // @grant       none
 // @run-at      document-start
-// @version     0.3.5
+// @version     0.3.7
 // @downloadURL https://bitbucket.org/liiws/habr-best-comments/downloads/habr-best-comments.user.js
 // @updateURL   https://bitbucket.org/liiws/habr-best-comments/downloads/habr-best-comments.meta.js
 // ==/UserScript==
@@ -29,7 +29,13 @@
 	}
 })();
 
-window.addEventListener('load', function () {
+window.addEventListener('DOMContentLoaded', Run);
+window.addEventListener('load', Run);
+
+function Run() {
+	// if we called from 'DOMContentLoaded' then we don't need be called from 'onload'
+	 window.removeEventListener('load', Run);
+	
 	// options
 	var _fgAuthor = '#F76D59';
 	var _bgAuthor = '#FFAA9D';
@@ -224,4 +230,4 @@ window.addEventListener('load', function () {
 
     return { top: Math.round(top), left: Math.round(left) };
   }
-});
+}
