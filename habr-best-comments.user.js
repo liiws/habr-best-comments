@@ -15,7 +15,7 @@
 // @include     https://geektimes.ru/article/*
 // @grant       none
 // @run-at      document-start
-// @version     0.3.7
+// @version     0.3.8
 // @downloadURL https://bitbucket.org/liiws/habr-best-comments/downloads/habr-best-comments.user.js
 // @updateURL   https://bitbucket.org/liiws/habr-best-comments/downloads/habr-best-comments.meta.js
 // ==/UserScript==
@@ -41,6 +41,7 @@ function Run() {
 	var _bgAuthor = '#FFAA9D';
 	var _fgPositiveMark = '#339900';
 	var _fgNegativeMark = '#CC0000';
+	var _fgZeroMark = '#548EAA';
 	var _bgColor = '#F8F8F8';
 	var _bgColorNew = '#E8E8FF';
 	var _bgColorSelected = '#3D438D';
@@ -149,15 +150,18 @@ function Run() {
 			// create item
 			var item = $('<div class="hbc__item" style="text-align: right;"><a href="#" onclick="return false">0</a></div>');
 			//$('a', item).attr('href', '#' + comment.id);
-			$('a', item).text(isNaN(comment.mark) ? '?' : (comment.mark >= 0 ? '+' + comment.mark : comment.mark));
+			$('a', item).text(isNaN(comment.mark) ? '?' : (comment.mark > 0 ? '+' + comment.mark : comment.mark));
 			$('a', item).attr('iid', comment.id);
 
 			// mark color
-			if (comment.mark >= 0)
+			if (comment.mark > 0)
 				$('a', item).css('color', _fgPositiveMark);
-			else
+			else if (comment.mark < 0)
 				$('a', item).css('color', _fgNegativeMark);
+			else
+				$('a', item).css('color', _fgZeroMark);
 
+			
 			if (comment.isAuthor) {
 				$('a', item).before('<span style="color: ' + _fgAuthor + '; font-weight: bold;">A </span>');
 			}
