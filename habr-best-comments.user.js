@@ -15,7 +15,7 @@
 // @include     https://geektimes.ru/article/*
 // @grant       none
 // @run-at      document-start
-// @version     0.3.8
+// @version     0.3.9
 // @downloadURL https://bitbucket.org/liiws/habr-best-comments/downloads/habr-best-comments.user.js
 // @updateURL   https://bitbucket.org/liiws/habr-best-comments/downloads/habr-best-comments.meta.js
 // ==/UserScript==
@@ -55,7 +55,6 @@ function Run() {
 	var authorLogin = authorElement.length == 0 ? "" : authorElement.attr("href").split("/").filter(x => x != "").pop();
 	
 	ShowCommentsPanel();
-
 
 	// update button
 	$('span.refresh').click(function () {
@@ -97,7 +96,8 @@ function Run() {
 				minus = +markTitle.match(/↓(\d+)/)[1];
 			}
 			var isNew = $('> .comment__head', item).hasClass('comment__head_new-comment');
-			var userLogin = $.trim($('> .comment__head > .user-info', item).attr("href").split("/").filter(x => x != "").pop());
+			var userInfoHref = $('> .comment__head > .user-info', item).attr("href") || "";
+			var userLogin = $.trim(userInfoHref.split("/").filter(x => x != "").pop());
 			var mark = parseInt(markItem.text().match(/\d+/));
 			if (markItem.hasClass('voting-wjt__counter_negative'))
 				mark = -mark;
