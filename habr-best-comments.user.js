@@ -85,6 +85,10 @@ function Run() {
 	function GetAllComments() {
 		var allComments = [];
 		$('.comment').each(function (index, item) {
+			var isBanned = $('> .comment__message_banned', item).length > 0;
+			if (isBanned) {
+                		return ;
+            		}
 			var id = $(item).attr('id');
 			var markItemWrapper = $('> .comment__head > .js-comment-vote', item);
 			var markItem = $('> .js-score', markItemWrapper);
