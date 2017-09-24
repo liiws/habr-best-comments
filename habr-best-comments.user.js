@@ -15,7 +15,7 @@
 // @include     https://geektimes.ru/article/*
 // @grant       none
 // @run-at      document-start
-// @version     0.3.9
+// @version     0.3.11
 // @downloadURL https://bitbucket.org/liiws/habr-best-comments/downloads/habr-best-comments.user.js
 // @updateURL   https://bitbucket.org/liiws/habr-best-comments/downloads/habr-best-comments.meta.js
 // ==/UserScript==
@@ -87,8 +87,8 @@ function Run() {
 		$('.comment').each(function (index, item) {
 			var isBanned = $('> .comment__message_banned', item).length > 0;
 			if (isBanned) {
-                		return ;
-            		}
+				return;
+			}
 			var id = $(item).attr('id');
 			var markItemWrapper = $('> .comment__head > .js-comment-vote', item);
 			var markItem = $('> .js-score', markItemWrapper);
