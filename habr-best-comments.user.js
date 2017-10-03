@@ -15,7 +15,7 @@
 // @include     https://geektimes.ru/article/*
 // @grant       none
 // @run-at      document-start
-// @version     0.3.11
+// @version     0.4.0
 // @downloadURL https://bitbucket.org/liiws/habr-best-comments/downloads/habr-best-comments.user.js
 // @updateURL   https://bitbucket.org/liiws/habr-best-comments/downloads/habr-best-comments.meta.js
 // ==/UserScript==
@@ -47,7 +47,7 @@ function Run() {
 	var _bgColorSelected = '#3D438D';
 	var _highlightIntervalMs = 5400;
 	var _scrollTopOffsetPc = 0.2;
-	var _fgImage = '#0000FF';
+	var _fgMedia = '#0000FF';
 	var _fgLink = '#366804';
 
 
@@ -106,6 +106,7 @@ function Run() {
 			if (markItem.hasClass('voting-wjt__counter_negative'))
 				mark = -mark;
 			var hasImg = $('> .comment__message', item).find('img').length > 0;
+			var hasVideo = $('> .comment__message', item).find('iframe').length > 0;
 			var hasLink = $('> .comment__message', item).find('a').length > 0;
 
 			allComments.push(
@@ -115,6 +116,7 @@ function Run() {
 				isNew: isNew,
 				isAuthor: userLogin == authorLogin,
 				hasImg: hasImg,
+				hasVideo: hasVideo,
 				hasLink: hasLink,
 				plus: plus,
 				minus: minus,
@@ -170,7 +172,10 @@ function Run() {
 				$('a', item).before('<span style="color: ' + _fgAuthor + '; font-weight: bold;">A </span>');
 			}
 			if (comment.hasImg) {
-				$('a', item).before('<span style="color: ' + _fgImage + '; font-weight: bold;">i </span>');
+				$('a', item).before('<span style="color: ' + _fgMedia + '; font-weight: bold;">i </span>');
+			}
+			else if (comment.hasVideo) {
+				$('a', item).before('<span style="color: ' + _fgMedia + ';">v </span>');
 			}
 			if (comment.hasLink) {
 				$('a', item).before('<span style="color: ' + _fgLink + '; font-weight: bold;">L </span>');
