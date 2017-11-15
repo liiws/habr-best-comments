@@ -14,13 +14,9 @@
 
 Необходимо установить в браузер в качестве юзер-скрипта.
 
-Firefox - через [Greasemonkey](https://addons.mozilla.org/en-US/firefox/addon/greasemonkey).
+Например, через Tampermonkey - для [Vivaldi / Chrome / Opera 15+](https://chrome.google.com/webstore/detail/tampermonkey/dhdgffkkebhmkfjojejmpbldmpobfkfo), для [Firefox](https://addons.mozilla.org/en-US/firefox/addon/tampermonkey/).
 
-Vivaldi - через [Tampermonkey](https://chrome.google.com/webstore/detail/tampermonkey/dhdgffkkebhmkfjojejmpbldmpobfkfo).
-
-Chrome - через [Tampermonkey](https://chrome.google.com/webstore/detail/tampermonkey/dhdgffkkebhmkfjojejmpbldmpobfkfo).
-
-Opera 15+ - через [Tampermonkey](https://chrome.google.com/webstore/detail/tampermonkey/dhdgffkkebhmkfjojejmpbldmpobfkfo) (разрешить установку расширений из галереи Chrome'а можно установкой расширения [Download Chrome Extension](https://addons.opera.com/en/extensions/details/download-chrome-extension-9)).
+Для Opera 15+ разрешить установку расширений из галереи Chrome'а можно установкой расширения [Download Chrome Extension](https://addons.opera.com/en/extensions/details/download-chrome-extension-9)).
 
 # Скачать
 
