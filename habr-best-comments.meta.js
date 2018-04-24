@@ -13,9 +13,22 @@
 // @include     https://geektimes.ru/post/*
 // @include     https://geektimes.ru/company/*
 // @include     https://geektimes.ru/article/*
+// @namespace   http://habr.com
+// @include     http://habr.com/post/*
+// @include     http://habr.com/company/*
+// @include     http://habr.com/article/*
+// @include     http://geektimes.com/post/*
+// @include     http://geektimes.com/company/*
+// @include     http://geektimes.com/article/*
+// @include     https://habr.com/post/*
+// @include     https://habr.com/company/*
+// @include     https://habr.com/article/*
+// @include     https://geektimes.com/post/*
+// @include     https://geektimes.com/company/*
+// @include     https://geektimes.com/article/*
 // @grant       none
 // @run-at      document-start
-// @version     0.4.1
+// @version     0.4.2
 // @downloadURL https://bitbucket.org/liiws/habr-best-comments/downloads/habr-best-comments.user.js
 // @updateURL   https://bitbucket.org/liiws/habr-best-comments/downloads/habr-best-comments.meta.js
 // ==/UserScript==
