@@ -28,7 +28,7 @@
 // @include     https://geektimes.com/article/*
 // @grant       none
 // @run-at      document-start
-// @version     0.4.2
+// @version     0.4.3
 // @downloadURL https://bitbucket.org/liiws/habr-best-comments/downloads/habr-best-comments.user.js
 // @updateURL   https://bitbucket.org/liiws/habr-best-comments/downloads/habr-best-comments.meta.js
 // ==/UserScript==
