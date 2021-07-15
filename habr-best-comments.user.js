@@ -11,7 +11,7 @@
 // @include     https://habr.com/en/news/*
 // @grant       none
 // @run-at      document-start
-// @version     1.0.3
+// @version     1.0.5
 // @downloadURL https://bitbucket.org/liiws/habr-best-comments/downloads/habr-best-comments.user.js
 // @updateURL   https://bitbucket.org/liiws/habr-best-comments/downloads/habr-best-comments.meta.js
 // ==/UserScript==
@@ -75,19 +75,26 @@ function ObserveComments() {
 }
 
 function ProcessComments() {
+
+    var storedOptionsJson = window.localStorage.getItem("habr-best-comments-options") || "{}";
+    var storedOptions = JSON.parse(storedOptionsJson);
+
 	// options
-	var _fgAuthor = '#F76D59';
-	var _bgAuthor = '#FFAA9D';
-	var _fgPositiveMark = '#339900';
-	var _fgNegativeMark = '#CC0000';
-	var _fgZeroMark = '#548EAA';
-	var _bgColor = '#F8F8F8';
-	var _bgColorNew = '#E8E8FF';
-	var _bgColorSelected = '#3D438D';
-	var _highlightIntervalMs = 1500;
-	var _scrollTopOffsetPc = 0.2;
-	var _fgMedia = '#0000FF';
-	var _fgLink = '#366804';
+	var _fgAuthor = storedOptions.fgAuthor || '#F76D59';
+	var _bgAuthor = storedOptions.bgAuthor || '#FFAA9D';
+	var _fgPositiveMark = storedOptions.fgPositiveMark || '#339900';
+	var _fgNegativeMark = storedOptions.fgNegativeMark || '#CC0000';
+	var _fgZeroMark = storedOptions.fgZeroMark || '#548EAA';
+	var _bgColor = storedOptions.bgColor || '#F8F8F8';
+	var _bgColorNew = storedOptions.bgColorNew || '#E8E8FF';
+	var _bgColorSelected = storedOptions.bgColorSelected || '#3D438D';
+	var _highlightIntervalMs = storedOptions.highlightIntervalMs || 1500;
+	var _scrollTopOffsetPc = storedOptions.scrollTopOffsetPc || 0.2;
+	var _fgMedia = storedOptions.fgMedia || '#0000FF';
+	var _fgLink = storedOptions.fgLink || '#366804';
+    var _bgHighlight = storedOptions.bgHighlight || 'yellow';
+    var _hideLowRatingComments = storedOptions.hideLowRatingComments || false;
+    var _hideLowRatingCommentsBelow = storedOptions.hideLowRatingCommentsBelow || -10;
 
 
 	var authorElement = document.querySelector(".tm-user-info__username");
@@ -145,19 +152,24 @@ function ProcessComments() {
 			var hasVideo = item.querySelector(".tm-comment__body-content iframe") != null;
 			var hasLink = item.querySelector(".tm-comment__body-content a") != null;
 
-			allComments.push(
-			{
-				id: id,
-				mark: mark,
-				isNew: isNew,
-				isAuthor: userLogin == authorLogin,
-				hasImg: hasImg,
-				hasVideo: hasVideo,
-				hasLink: hasLink,
-				plus: plus,
-				minus: minus,
-                element: item
-			});
+            if (_hideLowRatingComments && mark < _hideLowRatingCommentsBelow) {
+                // skip comment
+            }
+            else {
+                allComments.push(
+                    {
+                        id: id,
+                        mark: mark,
+                        isNew: isNew,
+                        isAuthor: userLogin == authorLogin,
+                        hasImg: hasImg,
+                        hasVideo: hasVideo,
+                        hasLink: hasLink,
+                        plus: plus,
+                        minus: minus,
+                        element: item
+                    });
+            }
 		});
 
 
@@ -268,7 +280,7 @@ function ProcessComments() {
 		window.scrollTo(0, elementPosition.top - viewHeight*_scrollTopOffsetPc);
 
 		// highlight comment
-        commentElement.style.backgroundColor = 'yellow';
+        commentElement.style.backgroundColor = _bgHighlight;
         setTimeout(function(){ commentElement.style.backgroundColor = '' ; }, _highlightIntervalMs);
 	}
 
