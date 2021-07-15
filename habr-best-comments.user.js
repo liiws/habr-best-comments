@@ -11,7 +11,7 @@
 // @include     https://habr.com/en/news/*
 // @grant       none
 // @run-at      document-start
-// @version     0.4.6
+// @version     1.0.3
 // @downloadURL https://bitbucket.org/liiws/habr-best-comments/downloads/habr-best-comments.user.js
 // @updateURL   https://bitbucket.org/liiws/habr-best-comments/downloads/habr-best-comments.meta.js
 // ==/UserScript==
@@ -28,10 +28,53 @@
 window.addEventListener('DOMContentLoaded', Run);
 window.addEventListener('load', Run);
 
+var observeDOM = (function() {
+    var MutationObserver = window.MutationObserver || window.WebKitMutationObserver;
+
+    return function( obj, callback ) {
+        if (!obj || obj.nodeType !== 1) {
+            return;
+        }
+
+        if (MutationObserver) {
+            // define a new observer
+            var mutationObserver = new MutationObserver(callback);
+
+            // have the observer observe foo for changes in children
+            mutationObserver.observe(obj, { childList:true, subtree:true });
+            return mutationObserver;
+        }
+    }
+})();
+
+var processCommentsTimerId;
+
 function Run() {
 	// if we called from 'DOMContentLoaded' then we don't need be called from 'onload'
 	 window.removeEventListener('load', Run);
-	
+
+    var hasCommentsSection = document.querySelector(".tm-article-comments") != null;
+    if (!hasCommentsSection) {
+        return;
+    }
+
+    ObserveComments();
+
+    ProcessComments();
+}
+
+function ObserveComments() {
+    var observer = observeDOM(document.querySelector(".tm-article-comments").parentNode, function(m) {
+        observer.disconnect();
+        clearTimeout(processCommentsTimerId);
+        processCommentsTimerId = setTimeout(function() {
+            ProcessComments();
+            ObserveComments();
+        }, 500);
+    });
+}
+
+function ProcessComments() {
 	// options
 	var _fgAuthor = '#F76D59';
 	var _bgAuthor = '#FFAA9D';
@@ -41,17 +84,17 @@ function Run() {
 	var _bgColor = '#F8F8F8';
 	var _bgColorNew = '#E8E8FF';
 	var _bgColorSelected = '#3D438D';
-	var _highlightIntervalMs = 5400;
+	var _highlightIntervalMs = 1500;
 	var _scrollTopOffsetPc = 0.2;
 	var _fgMedia = '#0000FF';
 	var _fgLink = '#366804';
 
 
-	var authorElement = $(".post__user-info.user-info");
-	var authorLogin = authorElement.length == 0 ? "" : authorElement.attr("href").split("/").filter(x => x != "").pop();
-	
-	ShowCommentsPanel();
+	var authorElement = document.querySelector(".tm-user-info__username");
+	var authorLogin = authorElement ? authorElement.href.split("/").filter(x => x != "").pop() : "";
 
+    ShowCommentsPanel();
+/*
 	// update button
 	$('span.refresh').click(function () {
 		$('.hbc').remove();
@@ -70,7 +113,7 @@ function Run() {
 			}
 		}
 	});
-
+*/
 
 
 	function ShowCommentsPanel() {
@@ -80,30 +123,27 @@ function Run() {
 
 	function GetAllComments() {
 		var allComments = [];
-		$('.comment').each(function (index, item) {
-			var isBanned = $('> .comment__message_banned', item).length > 0;
+        document.querySelectorAll(".tm-comment-thread-functional__comment").forEach(item => {
+			var isBanned = item.querySelector(".tm-comment__ufo") != null;
 			if (isBanned) {
 				return;
 			}
-			var id = $(item).attr('id');
-			var markItemWrapper = $('> .comment__head > .js-comment-vote', item);
-			var markItem = $('> .js-score', markItemWrapper);
-			var markTitle = markItem.attr('title');
+			var id = item.querySelector(".tm-comment-thread-functional__target").getAttribute("name");
+			var markTitleElement = item.querySelector(".tm-votes-meter__value") || item.querySelector(".tm-votes-lever");
+            var markTitle = markTitleElement.getAttribute("title");
 			var plus = 0;
 			var minus = 0;
-			if (markTitle && markTitle.length > 0) {
+			if (markTitle) {
 				plus = +(markTitle.match(/↑(\d+)/) || [])[1];
 				minus = +(markTitle.match(/↓(\d+)/) || [])[1];
 			}
-			var isNew = $('> .comment__head', item).hasClass('comment__head_new-comment');
-			var userInfoHref = $('> .comment__head > .user-info', item).attr("href") || "";
-			var userLogin = $.trim(userInfoHref.split("/").filter(x => x != "").pop());
-			var mark = parseInt(markItem.text().match(/\d+/));
-			if (markItem.hasClass('voting-wjt__counter_negative'))
-				mark = -mark;
-			var hasImg = $('> .comment__message', item).find('img').length > 0;
-			var hasVideo = $('> .comment__message', item).find('iframe').length > 0;
-			var hasLink = $('> .comment__message', item).find('a').length > 0;
+			var isNew = item.querySelector(".tm-comment-thread-functional__target").getAttribute("[data-comment-new]") != null;
+			var userInfoHref = item.querySelector(".tm-user-info__username").getAttribute("href") || "";
+			var userLogin = userInfoHref.split("/").filter(x => x != "").pop();
+            var mark = plus - minus;
+			var hasImg = item.querySelector(".tm-comment__body-content img") != null;
+			var hasVideo = item.querySelector(".tm-comment__body-content iframe") != null;
+			var hasLink = item.querySelector(".tm-comment__body-content a") != null;
 
 			allComments.push(
 			{
@@ -116,7 +156,7 @@ function Run() {
 				hasLink: hasLink,
 				plus: plus,
 				minus: minus,
-				markItemWrapper: markItemWrapper
+                element: item
 			});
 		});
 
@@ -129,7 +169,7 @@ function Run() {
 			return prev;
 		}, []);
 
-		// best desc, time asc		
+        // best desc, time asc
 		allComments.sort(function (a, b) {
 			return a.mark == b.mark
 				? (a.id < b.id ? 1 : -1)
@@ -142,101 +182,110 @@ function Run() {
 
 
 	function ShowComments(comments) {
-		var wnd = $('<div class="hbc" style="width: 80px; top: 55px; bottom: 10px; right: 49px; overflow: auto; position: fixed; z-index: 999; line-height: 1.1em;"></div>');
-		$(wnd).css('background-color', _bgColor);
-		$('body').append(wnd);
-		$.each(comments, function (index, comment) {
-			
+        var wnd = document.createElement("div");
+        wnd.className = "hbc";
+        wnd.style = "width: 80px; top: 55px; bottom: 10px; right: 49px; overflow: auto; position: fixed; z-index: 999; line-height: 1.1em; font-size: 15px; background-color: " + _bgColor;
+		document.body.appendChild(wnd);
+		comments.forEach(comment => {
+
 			// right panel
-			
-			// create item
-			var item = $('<div class="hbc__item" style="text-align: right;"><a href="#" onclick="return false">0</a></div>');
-			//$('a', item).attr('href', '#' + comment.id);
-			$('a', item).text(isNaN(comment.mark) ? '?' : (comment.mark > 0 ? '+' + comment.mark : comment.mark));
-			$('a', item).attr('iid', comment.id);
 
-			// mark color
+            var itemText = isNaN(comment.mark) ? '?' : (comment.mark > 0 ? '+' + comment.mark : comment.mark);
+            var itemColor = _fgZeroMark;
 			if (comment.mark > 0)
-				$('a', item).css('color', _fgPositiveMark);
+				itemColor = _fgPositiveMark;
 			else if (comment.mark < 0)
-				$('a', item).css('color', _fgNegativeMark);
-			else
-				$('a', item).css('color', _fgZeroMark);
+				itemColor = _fgNegativeMark;
 
-			
+            var aPrefix = "";
 			if (comment.isAuthor) {
-				$('a', item).before('<span style="color: ' + _fgAuthor + '; font-weight: bold;">A </span>');
+				aPrefix += '<span style="color: ' + _fgAuthor + '; font-weight: bold;">A </span>';
 			}
 			if (comment.hasImg) {
-				$('a', item).before('<span style="color: ' + _fgMedia + '; font-weight: bold;">i </span>');
+				aPrefix += '<span style="color: ' + _fgMedia + '; font-weight: bold;">i </span>';
 			}
-			else if (comment.hasVideo) {
-				$('a', item).before('<span style="color: ' + _fgMedia + ';">v </span>');
+			if (comment.hasVideo) {
+				aPrefix += '<span style="color: ' + _fgMedia + ';">v </span>';
 			}
 			if (comment.hasLink) {
-				$('a', item).before('<span style="color: ' + _fgLink + '; font-weight: bold;">L </span>');
+				aPrefix += '<span style="color: ' + _fgLink + '; font-weight: bold;">L </span>';
 			}
+
+			// create item
+            var item = document.createElement("div");
+            item.className = "hbc__item";
+            item.style = "text-align: right;";
+            item.innerHTML = aPrefix + '<a href="#" onclick="return false" style="color: ' + itemColor + '">' + itemText + '</a>';
+            item.setAttribute("iid", comment.id);
 
 			// bg color
 			if (comment.isNew) {
-				$(item).addClass('hbc__item-when-new');
-				$(item).css('background-color', _bgColorNew);
+				item.classList.add("hbc__item-when-new");
+                item.style.backgroundColor = _bgColorNew;
 			}
 
 			// onclick event
-			$(item).bind('click', Comment_OnClick);
+			item.onclick = Comment_OnClick;
 
 			// add item
-			$(wnd).append(item);
-			
-			
+			wnd.appendChild(item);
+
+
 			// add plus/minus to the comment mark
-			
+
 			if (comment.plus > 0 && comment.minus > 0) {
-				var markItemWrapper = comment.markItemWrapper;
-				markItemWrapper.find('.hbc__mark-add').remove();
-				item = $('<div class="hbc__mark-add" style="font-weight: bold; line-height: 6px; opacity: 0.4; text-align: right; padding-right: 25px; margin-top: -6px;"><span style="color: ' + _fgPositiveMark + ';">+' + comment.plus + '</span> <span style="color: ' + _fgNegativeMark + ';">-' + comment.minus + '</span></div>');				
-				markItemWrapper.closest('.comment').find('.comment__head').after(item);
+                var prevScoreDetails = comment.element.querySelector(".hbc__mark-add");
+                if (prevScoreDetails) {
+                    prevScoreDetails.remove();
+                }
+
+                var scoreDetails = document.createElement("div");
+                scoreDetails.className = "hbc__mark-add";
+                scoreDetails.style = "font-weight: bold; line-height: 6px; opacity: 0.4; text-align: left; margin-top: 5px; position: absolute; width: 100px; font-size: 13px;";
+                scoreDetails.innerHTML = '<span style="color: ' + _fgPositiveMark + ';">+' + comment.plus + '</span> <span style="color: ' + _fgNegativeMark + ';">-' + comment.minus + '</span>';
+                var votesElement = comment.element.querySelector(".tm-votes-meter__value") || comment.element.querySelector(".tm-votes-lever__score-counter");
+                votesElement.appendChild(scoreDetails);
 			}
-			
+
 		});
 
 		// highlight author name
-		$('.comment__head > a.user-info:contains("' + authorLogin + '")').css('background-color', _bgAuthor);
+		//$('.comment__head > a.user-info:contains("' + authorLogin + '")').css('background-color', _bgAuthor);
 	}
 
 	function Comment_OnClick() {
-		$('.hbc__item').css('background-color', _bgColor);
-		$('.hbc__item-when-new').css('background-color', _bgColorNew);
-		$(this).css('background-color', _bgColorSelected);
+		document.querySelectorAll(".hbc__item").forEach(item => item.style.backgroundColor = _bgColor);
+		document.querySelectorAll(".bc__item-when-new").forEach(item => item.style.backgroundColor = _bgColorNew);
+		this.style.backgroundColor = _bgColorSelected;
 		// go to url before browser "A" to emulate click at "A" two times. Habr has bug - click on "A" first time after page opening goes to wrong comment.
 		//document.location = $(this).find('a').attr('href');
-		
+
 		// scroll to comment
-		var id = $(this).find('a').attr('iid');
-		var commentElement = document.getElementById(id);
+		var id = this.getAttribute("iid");
+		var commentElement = document.getElementsByName(id)[0];
 		var elementPosition = GetElementPosition(commentElement);
 		var viewHeight = Math.max(document.documentElement.clientHeight, window.innerHeight || 0);
 		window.scrollTo(0, elementPosition.top - viewHeight*_scrollTopOffsetPc);
-		
+
 		// highlight comment
-		$(commentElement).effect("highlight", {}, _highlightIntervalMs);
+        commentElement.style.backgroundColor = 'yellow';
+        setTimeout(function(){ commentElement.style.backgroundColor = '' ; }, _highlightIntervalMs);
 	}
-	
-  function GetElementPosition(elem) {
-    var body = document.body;
-    var docEl = document.documentElement;
 
-    var scrollTop = window.pageYOffset || docEl.scrollTop || body.scrollTop;
-    var scrollLeft = window.pageXOffset || docEl.scrollLeft || body.scrollLeft;
+    function GetElementPosition(elem) {
+        var body = document.body;
+        var docEl = document.documentElement;
 
-    var clientTop = docEl.clientTop || body.clientTop || 0;
-    var clientLeft = docEl.clientLeft || body.clientLeft || 0;
+        var scrollTop = window.pageYOffset || docEl.scrollTop || body.scrollTop;
+        var scrollLeft = window.pageXOffset || docEl.scrollLeft || body.scrollLeft;
 
-    var box = elem.getBoundingClientRect();
-    var top  = box.top +  scrollTop - clientTop;
-    var left = box.left + scrollLeft - clientLeft;
+        var clientTop = docEl.clientTop || body.clientTop || 0;
+        var clientLeft = docEl.clientLeft || body.clientLeft || 0;
 
-    return { top: Math.round(top), left: Math.round(left) };
-  }
+        var box = elem.getBoundingClientRect();
+        var top = box.top + scrollTop - clientTop;
+        var left = box.left + scrollLeft - clientLeft;
+
+        return { top: Math.round(top), left: Math.round(left) };
+    }
 }
