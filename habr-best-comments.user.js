@@ -11,7 +11,7 @@
 // @include     https://habr.com/en/news/*
 // @grant       none
 // @run-at      document-start
-// @version     1.0.5
+// @version     1.0.6
 // @downloadURL https://bitbucket.org/liiws/habr-best-comments/downloads/habr-best-comments.user.js
 // @updateURL   https://bitbucket.org/liiws/habr-best-comments/downloads/habr-best-comments.meta.js
 // ==/UserScript==
@@ -95,32 +95,14 @@ function ProcessComments() {
     var _bgHighlight = storedOptions.bgHighlight || 'yellow';
     var _hideLowRatingComments = storedOptions.hideLowRatingComments || false;
     var _hideLowRatingCommentsBelow = storedOptions.hideLowRatingCommentsBelow || -10;
+    var _preserveExtraLowRatingComments = storedOptions.preserveExtraLowRatingComments || false;
+    var _preserveExtraLowRatingCommentsBelow = storedOptions.preserveExtraLowRatingCommentsBelow || -30;
 
 
 	var authorElement = document.querySelector(".tm-user-info__username");
 	var authorLogin = authorElement ? authorElement.href.split("/").filter(x => x != "").pop() : "";
 
     ShowCommentsPanel();
-/*
-	// update button
-	$('span.refresh').click(function () {
-		$('.hbc').remove();
-		setTimeout(function () {
-			WaitForCommentsWillBeLoadedAndUpdateComments();
-		}, 500);
-
-		function WaitForCommentsWillBeLoadedAndUpdateComments() {
-			if ($('span.refresh').hasClass('loading')) {
-				// wait till update end
-				setTimeout(WaitForCommentsWillBeLoadedAndUpdateComments, 100);
-			}
-			else {
-				// update comments
-				ShowCommentsPanel();
-			}
-		}
-	});
-*/
 
 
 	function ShowCommentsPanel() {
@@ -152,7 +134,7 @@ function ProcessComments() {
 			var hasVideo = item.querySelector(".tm-comment__body-content iframe") != null;
 			var hasLink = item.querySelector(".tm-comment__body-content a") != null;
 
-            if (_hideLowRatingComments && mark < _hideLowRatingCommentsBelow) {
+            if (_hideLowRatingComments && mark < _hideLowRatingCommentsBelow && !(_preserveExtraLowRatingComments && mark < _preserveExtraLowRatingCommentsBelow)) {
                 // skip comment
             }
             else {
@@ -194,6 +176,11 @@ function ProcessComments() {
 
 
 	function ShowComments(comments) {
+        var prevWnd = document.querySelector(".hbc");
+        if (prevWnd) {
+            prevWnd.remove();
+        }
+
         var wnd = document.createElement("div");
         wnd.className = "hbc";
         wnd.style = "width: 80px; top: 55px; bottom: 10px; right: 49px; overflow: auto; position: fixed; z-index: 999; line-height: 1.1em; font-size: 15px; background-color: " + _bgColor;
