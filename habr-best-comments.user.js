@@ -11,7 +11,7 @@
 // @include     https://habr.com/en/news/*
 // @grant       none
 // @run-at      document-start
-// @version     1.0.6
+// @version     1.0.7
 // @downloadURL https://bitbucket.org/liiws/habr-best-comments/downloads/habr-best-comments.user.js
 // @updateURL   https://bitbucket.org/liiws/habr-best-comments/downloads/habr-best-comments.meta.js
 // ==/UserScript==
@@ -53,14 +53,17 @@ function Run() {
 	// if we called from 'DOMContentLoaded' then we don't need be called from 'onload'
 	 window.removeEventListener('load', Run);
 
-    var hasCommentsSection = document.querySelector(".tm-article-comments") != null;
-    if (!hasCommentsSection) {
+    if (GetCommentsSection() == null) {
         return;
     }
 
     ObserveComments();
 
     ProcessComments();
+}
+
+function GetCommentsSection() {
+    return document.querySelector(".tm-article-comments");
 }
 
 function ObserveComments() {
@@ -247,6 +250,27 @@ function ProcessComments() {
 			}
 
 		});
+
+        if (comments.length == 0) {
+            var commentsSection = GetCommentsSection();
+            var commentCountElement = commentsSection.querySelector(".tm-article-comments-counter-link__value") || commentsSection.querySelector(".tm-comments__comments-count");
+            var commentsCount = commentCountElement.innerText.match(/\d+/)[0];
+
+			// create item
+            var item = document.createElement("div");
+            item.className = "hbc__item";
+            item.style = "text-align: center;";
+            item.innerHTML = '<a href="#" onclick="return false" style="color: ' + _fgZeroMark + '">↓↓↓↓↓<br/>' + commentsCount + '</a>';
+
+			// onclick event
+			item.onclick = () => {
+                var elementPosition = GetElementPosition(commentsSection);
+                window.scrollTo(0, elementPosition.top - commentsSection.clientHeight);
+            };
+
+			// add item
+			wnd.appendChild(item);
+        }
 
 		// highlight author name
 		//$('.comment__head > a.user-info:contains("' + authorLogin + '")').css('background-color', _bgAuthor);
