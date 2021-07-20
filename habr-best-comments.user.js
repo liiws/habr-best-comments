@@ -11,7 +11,7 @@
 // @include     https://habr.com/en/news/*
 // @grant       none
 // @run-at      document-start
-// @version     1.0.7
+// @version     1.0.8
 // @downloadURL https://bitbucket.org/liiws/habr-best-comments/downloads/habr-best-comments.user.js
 // @updateURL   https://bitbucket.org/liiws/habr-best-comments/downloads/habr-best-comments.meta.js
 // ==/UserScript==
@@ -247,6 +247,10 @@ function ProcessComments() {
                 scoreDetails.innerHTML = '<span style="color: ' + _fgPositiveMark + ';">+' + comment.plus + '</span> <span style="color: ' + _fgNegativeMark + ';">-' + comment.minus + '</span>';
                 var votesElement = comment.element.querySelector(".tm-votes-meter__value") || comment.element.querySelector(".tm-votes-lever__score-counter");
                 votesElement.appendChild(scoreDetails);
+
+                votesElement.parentNode.style.display = "inline-block";
+                votesElement.parentNode.style.width = "50px";
+                votesElement.parentNode.style.paddingBottom = "8px";
 			}
 
 		});
