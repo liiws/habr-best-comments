@@ -11,7 +11,7 @@
 // @include     https://habr.com/en/news/*
 // @grant       none
 // @run-at      document-start
-// @version     1.0.8
+// @version     1.0.9
 // @downloadURL https://bitbucket.org/liiws/habr-best-comments/downloads/habr-best-comments.user.js
 // @updateURL   https://bitbucket.org/liiws/habr-best-comments/downloads/habr-best-comments.meta.js
 // ==/UserScript==
@@ -115,12 +115,12 @@ function ProcessComments() {
 
 	function GetAllComments() {
 		var allComments = [];
-        document.querySelectorAll(".tm-comment-thread-functional__comment").forEach(item => {
+        document.querySelectorAll(".tm-comment-thread__comment").forEach(item => {
 			var isBanned = item.querySelector(".tm-comment__ufo") != null;
 			if (isBanned) {
 				return;
 			}
-			var id = item.querySelector(".tm-comment-thread-functional__target").getAttribute("name");
+			var id = item.querySelector(".tm-comment-thread__target").getAttribute("name");
 			var markTitleElement = item.querySelector(".tm-votes-meter__value") || item.querySelector(".tm-votes-lever");
             var markTitle = markTitleElement.getAttribute("title");
 			var plus = 0;
@@ -129,7 +129,7 @@ function ProcessComments() {
 				plus = +(markTitle.match(/↑(\d+)/) || [])[1];
 				minus = +(markTitle.match(/↓(\d+)/) || [])[1];
 			}
-			var isNew = item.querySelector(".tm-comment-thread-functional__target").getAttribute("[data-comment-new]") != null;
+			var isNew = item.querySelector(".tm-comment__header_is-new") != null;
 			var userInfoHref = item.querySelector(".tm-user-info__username").getAttribute("href") || "";
 			var userLogin = userInfoHref.split("/").filter(x => x != "").pop();
             var mark = plus - minus;
