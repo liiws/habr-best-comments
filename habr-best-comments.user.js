@@ -11,7 +11,7 @@
 // @include     https://habr.com/en/news/*
 // @grant       none
 // @run-at      document-start
-// @version     1.0.13
+// @version     1.0.14
 // @downloadURL https://bitbucket.org/liiws/habr-best-comments/downloads/habr-best-comments.user.js
 // @updateURL   https://bitbucket.org/liiws/habr-best-comments/downloads/habr-best-comments.meta.js
 // ==/UserScript==
@@ -179,8 +179,10 @@ function ProcessComments() {
 
 
 	function ShowComments(comments) {
+        var prevSelectedCommentId;
         var prevWnd = document.querySelector(".hbc");
         if (prevWnd) {
+            prevSelectedCommentId = prevWnd.getAttribute("data-selected-id");
             prevWnd.remove();
         }
 
@@ -278,12 +280,18 @@ function ProcessComments() {
 
 		// highlight author name
 		//$('.comment__head > a.user-info:contains("' + authorLogin + '")').css('background-color', _bgAuthor);
+
+        // restore selected comment
+        if (prevSelectedCommentId) {
+            var newCommentElement = document.querySelector("[iid='"+prevSelectedCommentId+"'");
+            if (newCommentElement) {
+                MarkItemSelected(newCommentElement);
+            }
+        }
 	}
 
 	function Comment_OnClick() {
-		document.querySelectorAll(".hbc__item").forEach(item => item.style.backgroundColor = _bgColor);
-		document.querySelectorAll(".bc__item-when-new").forEach(item => item.style.backgroundColor = _bgColorNew);
-		this.style.backgroundColor = _bgColorSelected;
+        MarkItemSelected(this);
 		// go to url before browser "A" to emulate click at "A" two times. Habr has bug - click on "A" first time after page opening goes to wrong comment.
 		//document.location = $(this).find('a').attr('href');
 
@@ -297,7 +305,17 @@ function ProcessComments() {
 		// highlight comment
         commentElement.style.backgroundColor = _bgHighlight;
         setTimeout(function(){ commentElement.style.backgroundColor = '' ; }, _highlightIntervalMs);
+
+        // remember last selected comment
+        document.querySelector(".hbc").setAttribute("data-selected-id", id);
 	}
+
+    function MarkItemSelected(commentItem) {
+        console.log(commentItem);
+		document.querySelectorAll(".hbc__item").forEach(item => item.style.backgroundColor = _bgColor);
+		document.querySelectorAll(".bc__item-when-new").forEach(item => item.style.backgroundColor = _bgColorNew);
+		commentItem.style.backgroundColor = _bgColorSelected;
+    }
 
     function GetElementPosition(elem) {
         var body = document.body;
