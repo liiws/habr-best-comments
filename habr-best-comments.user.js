@@ -11,7 +11,7 @@
 // @include     https://habr.com/en/news/*
 // @grant       none
 // @run-at      document-start
-// @version     1.0.15
+// @version     1.0.16
 // @downloadURL https://bitbucket.org/liiws/habr-best-comments/downloads/habr-best-comments.user.js
 // @updateURL   https://bitbucket.org/liiws/habr-best-comments/downloads/habr-best-comments.meta.js
 // ==/UserScript==
@@ -179,10 +179,9 @@ function ProcessComments() {
 
 
 	function ShowComments(comments) {
-        var prevSelectedCommentId;
+        var prevSelectedCommentId = GetLastSelectedCommentId();
         var prevWnd = document.querySelector(".hbc");
         if (prevWnd) {
-            prevSelectedCommentId = prevWnd.getAttribute("data-selected-id");
             prevWnd.remove();
         }
 
@@ -283,6 +282,7 @@ function ProcessComments() {
 
         // restore selected comment
         if (prevSelectedCommentId) {
+            SetLastSelectedCommentId(prevSelectedCommentId);
             var newCommentElement = document.querySelector("[iid='"+prevSelectedCommentId+"'");
             if (newCommentElement) {
                 MarkItemSelected(newCommentElement);
@@ -306,12 +306,21 @@ function ProcessComments() {
         commentElement.style.backgroundColor = _bgHighlight;
         setTimeout(function(){ commentElement.style.backgroundColor = '' ; }, _highlightIntervalMs);
 
-        // remember last selected comment
-        document.querySelector(".hbc").setAttribute("data-selected-id", id);
+        SetLastSelectedCommentId(id);
 	}
 
+    function GetLastSelectedCommentId() {
+        var wnd = document.querySelector(".hbc");
+        if (wnd) {
+            return wnd.getAttribute("data-selected-id");
+        }
+    }
+
+    function SetLastSelectedCommentId(id) {
+        document.querySelector(".hbc").setAttribute("data-selected-id", id);
+    }
+
     function MarkItemSelected(commentItem) {
-        console.log(commentItem);
 		document.querySelectorAll(".hbc__item").forEach(item => item.style.backgroundColor = _bgColor);
 		document.querySelectorAll(".bc__item-when-new").forEach(item => item.style.backgroundColor = _bgColorNew);
 		commentItem.style.backgroundColor = _bgColorSelected;
