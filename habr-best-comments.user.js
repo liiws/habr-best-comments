@@ -11,7 +11,7 @@
 // @include     https://habr.com/en/news/*
 // @grant       none
 // @run-at      document-start
-// @version     1.0.16
+// @version     1.0.17
 // @downloadURL https://bitbucket.org/liiws/habr-best-comments/downloads/habr-best-comments.user.js
 // @updateURL   https://bitbucket.org/liiws/habr-best-comments/downloads/habr-best-comments.meta.js
 // ==/UserScript==
@@ -57,9 +57,8 @@ function Run() {
         return;
     }
 
-    ObserveComments();
-
     ProcessComments();
+    ObserveComments();
 }
 
 function GetCommentsSection() {
@@ -322,7 +321,7 @@ function ProcessComments() {
 
     function MarkItemSelected(commentItem) {
 		document.querySelectorAll(".hbc__item").forEach(item => item.style.backgroundColor = _bgColor);
-		document.querySelectorAll(".bc__item-when-new").forEach(item => item.style.backgroundColor = _bgColorNew);
+		document.querySelectorAll(".hbc__item-when-new").forEach(item => item.style.backgroundColor = _bgColorNew);
 		commentItem.style.backgroundColor = _bgColorSelected;
     }
 
