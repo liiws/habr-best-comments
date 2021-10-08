@@ -1,6 +1,8 @@
 // ==UserScript==
 // @name        habr-best-comments
 // @namespace   http://habr.com
+// @include     https://habr.com/ru/*
+// @include     https://habr.com/en/*
 // @include     https://habr.com/ru/post/*
 // @include     https://habr.com/ru/company/*
 // @include     https://habr.com/ru/article/*
@@ -11,7 +13,7 @@
 // @include     https://habr.com/en/news/*
 // @grant       none
 // @run-at      document-start
-// @version     1.0.17
+// @version     1.0.18
 // @downloadURL https://bitbucket.org/liiws/habr-best-comments/downloads/habr-best-comments.user.js
 // @updateURL   https://bitbucket.org/liiws/habr-best-comments/downloads/habr-best-comments.meta.js
 // ==/UserScript==
@@ -53,20 +55,16 @@ function Run() {
 	// if we called from 'DOMContentLoaded' then we don't need be called from 'onload'
 	 window.removeEventListener('load', Run);
 
-    if (GetCommentsSection() == null) {
-        return;
-    }
-
     ProcessComments();
     ObserveComments();
 }
 
 function GetCommentsSection() {
-    return document.querySelector(".tm-page-article__comments") || document.querySelector(".tm-article-comments");
+    return document.querySelector(".tm-article-page-comments") || document.querySelector(".tm-page-article__comments") || document.querySelector(".tm-article-comments");
 }
 
 function ObserveComments() {
-    var observer = observeDOM(GetCommentsSection().parentNode, function(m) {
+    var observer = observeDOM(document.getElementById("app"), function(m) {
         observer.disconnect();
         clearTimeout(processCommentsTimerId);
         processCommentsTimerId = setTimeout(function() {
@@ -184,6 +182,12 @@ function ProcessComments() {
             prevWnd.remove();
         }
 
+        var commentsSection = GetCommentsSection();
+        if (!commentsSection) {
+            return;
+        }
+
+
         var wnd = document.createElement("div");
         wnd.className = "hbc";
         wnd.style = "width: 80px; top: 55px; bottom: 10px; right: 49px; overflow: auto; position: fixed; z-index: 999; line-height: 1.1em; font-size: 15px; background-color: " + _bgColor;
@@ -256,7 +260,6 @@ function ProcessComments() {
 		});
 
         if (comments.length == 0) {
-            var commentsSection = GetCommentsSection();
             var commentCountElement = commentsSection.querySelector(".tm-article-comments-counter-link__value") || commentsSection.querySelector(".tm-comments__comments-count") || commentsSection.querySelector(".tm-comments-wrapper__comments-count");
             var commentsCount = commentCountElement.innerText.match(/\d+/)[0];
 
