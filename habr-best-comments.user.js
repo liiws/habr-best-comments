@@ -13,7 +13,7 @@
 // @include     https://habr.com/en/news/*
 // @grant       none
 // @run-at      document-start
-// @version     1.0.18
+// @version     1.0.19
 // @downloadURL https://bitbucket.org/liiws/habr-best-comments/downloads/habr-best-comments.user.js
 // @updateURL   https://bitbucket.org/liiws/habr-best-comments/downloads/habr-best-comments.meta.js
 // ==/UserScript==
@@ -247,7 +247,7 @@ function ProcessComments() {
 
                 var scoreDetails = document.createElement("div");
                 scoreDetails.className = "hbc__mark-add";
-                scoreDetails.style = "font-weight: bold; line-height: 6px; opacity: 0.4; text-align: left; margin-top: 5px; position: absolute; width: 100px; font-size: 13px;";
+                scoreDetails.style = "font-weight: bold; line-height: 6px; opacity: 0.4; text-align: left; margin-top: 0px; position: absolute; width: 100px; font-size: 13px;";
                 scoreDetails.innerHTML = '<span style="color: ' + _fgPositiveMark + ';">+' + comment.plus + '</span> <span style="color: ' + _fgNegativeMark + ';">-' + comment.minus + '</span>';
                 var votesElement = comment.element.querySelector(".tm-votes-meter__value") || comment.element.querySelector(".tm-votes-lever__score-counter");
                 votesElement.appendChild(scoreDetails);
