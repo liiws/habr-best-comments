@@ -13,7 +13,7 @@
 // @include     https://habr.com/en/news/*
 // @grant       none
 // @run-at      document-start
-// @version     1.0.20
+// @version     1.0.21
 // @downloadURL https://bitbucket.org/liiws/habr-best-comments/downloads/habr-best-comments.user.js
 // @updateURL   https://bitbucket.org/liiws/habr-best-comments/downloads/habr-best-comments.meta.js
 // ==/UserScript==
@@ -120,7 +120,7 @@ function ProcessComments() {
 			}
 			var id = item.querySelector(".tm-comment-thread__target").getAttribute("name");
 			var markTitleElement = item.querySelector(".tm-votes-meter__value") || item.querySelector(".tm-votes-lever");
-            var markTitle = markTitleElement.getAttribute("title");
+            var markTitle = markTitleElement ? markTitleElement.getAttribute("title") : "";
 			var plus = 0;
 			var minus = 0;
 			if (markTitle) {
@@ -128,7 +128,8 @@ function ProcessComments() {
 				minus = +(markTitle.match(/↓(\d+)/) || [])[1] || 0;
 			}
 			var isNew = item.querySelector(".tm-comment__header_is-new") != null;
-			var userInfoHref = item.querySelector(".tm-user-info__username").getAttribute("href") || "";
+            var userInfoElement = item.querySelector(".tm-user-info__username");
+			var userInfoHref = userInfoElement ? userInfoElement.getAttribute("href") : "";
 			var userLogin = userInfoHref.split("/").filter(x => x != "").pop();
             var mark = plus - minus;
 			var hasImg = item.querySelector(".tm-comment__body-content img") != null;
