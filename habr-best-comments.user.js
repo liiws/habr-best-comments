@@ -13,7 +13,7 @@
 // @include     https://habr.com/en/news/*
 // @grant       none
 // @run-at      document-start
-// @version     1.0.21
+// @version     1.0.22
 // @downloadURL https://bitbucket.org/liiws/habr-best-comments/downloads/habr-best-comments.user.js
 // @updateURL   https://bitbucket.org/liiws/habr-best-comments/downloads/habr-best-comments.meta.js
 // ==/UserScript==
@@ -119,19 +119,12 @@ function ProcessComments() {
 				return;
 			}
 			var id = item.querySelector(".tm-comment-thread__target").getAttribute("name");
-			var markTitleElement = item.querySelector(".tm-votes-meter__value") || item.querySelector(".tm-votes-lever");
-            var markTitle = markTitleElement ? markTitleElement.getAttribute("title") : "";
-			var plus = 0;
-			var minus = 0;
-			if (markTitle) {
-				plus = +(markTitle.match(/↑(\d+)/) || [])[1] || 0;
-				minus = +(markTitle.match(/↓(\d+)/) || [])[1] || 0;
-			}
+			var markElement = item.querySelector(".tm-votes-lever__score-counter");
+			var mark = markElement ? +markElement.innerText : 0;
 			var isNew = item.querySelector(".tm-comment__header_is-new") != null;
-            var userInfoElement = item.querySelector(".tm-user-info__username");
+			var userInfoElement = item.querySelector(".tm-user-info__username");
 			var userInfoHref = userInfoElement ? userInfoElement.getAttribute("href") : "";
 			var userLogin = userInfoHref.split("/").filter(x => x != "").pop();
-            var mark = plus - minus;
 			var hasImg = item.querySelector(".tm-comment__body-content img") != null;
 			var hasVideo = item.querySelector(".tm-comment__body-content iframe") != null;
 			var hasLink = item.querySelector(".tm-comment__body-content a") != null;
@@ -149,8 +142,6 @@ function ProcessComments() {
                         hasImg: hasImg,
                         hasVideo: hasVideo,
                         hasLink: hasLink,
-                        plus: plus,
-                        minus: minus,
                         element: item
                     });
             }
@@ -236,28 +227,6 @@ function ProcessComments() {
 
 			// add item
 			wnd.appendChild(item);
-
-
-			// add plus/minus to the comment mark
-
-			if (comment.plus > 0 && comment.minus > 0) {
-                var prevScoreDetails = comment.element.querySelector(".hbc__mark-add");
-                if (prevScoreDetails) {
-                    prevScoreDetails.remove();
-                }
-
-                var scoreDetails = document.createElement("div");
-                scoreDetails.className = "hbc__mark-add";
-                scoreDetails.style = "font-weight: bold; line-height: 6px; opacity: 0.4; text-align: left; margin-top: 0px; position: absolute; width: 100px; font-size: 13px;";
-                scoreDetails.innerHTML = '<span style="color: ' + _fgPositiveMark + ';">+' + comment.plus + '</span> <span style="color: ' + _fgNegativeMark + ';">-' + comment.minus + '</span>';
-                var votesElement = comment.element.querySelector(".tm-votes-meter__value") || comment.element.querySelector(".tm-votes-lever__score-counter");
-                votesElement.appendChild(scoreDetails);
-
-                votesElement.parentNode.style.display = "inline-block";
-                votesElement.parentNode.style.width = "80px";
-                votesElement.parentNode.style.paddingBottom = "8px";
-			}
-
 		});
 
         if (comments.length == 0) {
