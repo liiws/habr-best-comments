@@ -13,7 +13,7 @@
 // @include     https://habr.com/en/news/*
 // @grant       none
 // @run-at      document-start
-// @version     1.0.24
+// @version     1.0.25
 // @downloadURL https://bitbucket.org/liiws/habr-best-comments/downloads/habr-best-comments.user.js
 // @updateURL   https://bitbucket.org/liiws/habr-best-comments/downloads/habr-best-comments.meta.js
 // ==/UserScript==
@@ -29,6 +29,17 @@
 
 window.addEventListener('DOMContentLoaded', Run);
 window.addEventListener('load', Run);
+
+// article id
+var match = window.location.href.match(/\d{5,}/);
+var articleId = 0;
+if (match && match.length > 0) {
+    articleId = match[0];
+}
+else {
+    return;
+}
+
 
 var observeDOM = (function() {
     var MutationObserver = window.MutationObserver || window.WebKitMutationObserver;
@@ -49,53 +60,6 @@ var observeDOM = (function() {
     }
 })();
 
-var commentIdToScore = {};
-
-var commentsSrcObserver = observeDOM(window.document.documentElement, function(m) {
-    var match = window.location.href.match(/\d{5,}/);
-    var articleId = 0;
-    if (match && match.length > 0) {
-        articleId = match[0];
-    }
-    else {
-        return;
-    }
-    loopM:
-    for (var i = 0; i < m.length; i++) {
-        var addedNodes = m[i].addedNodes;
-        for (var iNode = 0; iNode < addedNodes.length; iNode++) {
-            var node = addedNodes[iNode];
-            if (node && node.nodeName == "SCRIPT") {
-                var innerHtml = node.innerHTML;
-                if (innerHtml) {
-                    var posPreStart = innerHtml.indexOf("window.__INITIAL_STATE__");
-                    if (posPreStart != -1) {
-                        var posStart = innerHtml.indexOf("{", posPreStart);
-                        var posEnd = innerHtml.indexOf("};", posStart);
-                        if (posStart != -1 && posEnd != -1) {
-                            var json = innerHtml.substring(posStart, posEnd + 1);
-                            var wis = JSON.parse(json);
-                            if (wis && wis.comments.articleComments[articleId] && wis.comments.articleComments[articleId].refs) {
-                                var comments = wis.comments.articleComments[articleId].refs;
-                                for (var commentId in comments) {
-                                    if (commentId && +commentId > 0) {
-                                        var comment = comments[commentId];
-                                        if (comment && "score" in comment) {
-                                            commentIdToScore[commentId] = comment.score;
-                                        }
-                                    }
-                                }
-                                commentsSrcObserver.disconnect();
-                            }
-                            break loopM;
-                        }
-                    }
-                }
-            }
-        }
-    }
-});
-
 
 var processCommentsTimerId;
 
@@ -103,7 +67,7 @@ function Run() {
 	// if we called from 'DOMContentLoaded' then we don't need be called from 'onload'
 	 window.removeEventListener('load', Run);
 
-    ProcessComments();
+    LoadAndProcessComments();
     ObserveComments();
 }
 
@@ -116,9 +80,41 @@ function ObserveComments() {
         observer.disconnect();
         clearTimeout(processCommentsTimerId);
         processCommentsTimerId = setTimeout(function() {
-            ProcessComments();
+            LoadAndProcessComments();
             ObserveComments();
         }, 500);
+    });
+}
+
+var commentIdToScore = {};
+
+function LoadAndProcessComments() {
+    var commentsUrl = location.origin + "/kek/v2/articles/" + articleId + "/comments";
+    fetch(commentsUrl)
+        .then(response => {
+        if (!response.ok) {
+            console.log("habr-best-comments: failed to load comments:");
+            console.log(response);
+        }
+        else {
+            response.text().then(text => {
+                if (text && text.length > 0 && text[0] == "{") {
+                    var commentsObject = JSON.parse(text);
+                    if (commentsObject && commentsObject.comments) {
+                        var comments = commentsObject.comments;
+                        for (var commentId in comments) {
+                            if (commentId && +commentId > 0) {
+                                var comment = comments[commentId];
+                                if (comment && "score" in comment) {
+                                    commentIdToScore[commentId] = comment.score;
+                                }
+                            }
+                        }
+                        ProcessComments();
+                    }
+                }
+            });
+        }
     });
 }
 
