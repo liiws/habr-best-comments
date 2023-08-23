@@ -13,7 +13,7 @@
 // @include     https://habr.com/en/news/*
 // @grant       none
 // @run-at      document-start
-// @version     1.0.22
+// @version     1.0.23
 // @downloadURL https://bitbucket.org/liiws/habr-best-comments/downloads/habr-best-comments.user.js
 // @updateURL   https://bitbucket.org/liiws/habr-best-comments/downloads/habr-best-comments.meta.js
 // ==/UserScript==
@@ -43,11 +43,59 @@ var observeDOM = (function() {
             var mutationObserver = new MutationObserver(callback);
 
             // have the observer observe foo for changes in children
-            mutationObserver.observe(obj, { childList:true, subtree:true });
+            mutationObserver.observe(obj, { childList: true, subtree: true });
             return mutationObserver;
         }
     }
 })();
+
+var commentIdToScore = {};
+
+var commentsSrcObserver = observeDOM(window.document.documentElement, function(m) {
+    var match = window.location.href.match(/\d{5,}/);
+    var articleId = 0;
+    if (match && match.length > 0) {
+        articleId = match[0];
+    }
+    else {
+        return;
+    }
+    loopM:
+    for (var i = 0; i < m.length; i++) {
+        var addedNodes = m[i].addedNodes;
+        for (var iNode = 0; iNode < addedNodes.length; iNode++) {
+            var node = addedNodes[iNode];
+            if (node && node.nodeName == "SCRIPT") {
+                var innerHtml = node.innerHTML;
+                if (innerHtml) {
+                    var posPreStart = innerHtml.indexOf("window.__INITIAL_STATE__");
+                    if (posPreStart != -1) {
+                        var posStart = innerHtml.indexOf("{", posPreStart);
+                        var posEnd = innerHtml.indexOf("};", posStart);
+                        if (posStart != -1 && posEnd != -1) {
+                            var json = innerHtml.substring(posStart, posEnd + 1);
+                            var wis = JSON.parse(json);
+                            if (wis && wis.comments.articleComments[articleId] && wis.comments.articleComments[articleId].refs) {
+                                var comments = wis.comments.articleComments[articleId].refs;
+                                for (var commentId in comments) {
+                                    if (commentId && +commentId > 0) {
+                                        var comment = comments[commentId];
+                                        if (comment && "score" in comment) {
+                                            commentIdToScore[commentId] = comment.score;
+                                        }
+                                    }
+                                }
+                                commentsSrcObserver.disconnect();
+                            }
+                            break loopM;
+                        }
+                    }
+                }
+            }
+        }
+    }
+});
+
 
 var processCommentsTimerId;
 
@@ -119,8 +167,11 @@ function ProcessComments() {
 				return;
 			}
 			var id = item.querySelector(".tm-comment-thread__target").getAttribute("name");
-			var markElement = item.querySelector(".tm-votes-lever__score-counter");
-			var mark = markElement ? +markElement.innerText : 0;
+
+            var idNumberMatch = (id || "").match(/\d{5,}/);
+			var idNumber = idNumberMatch && idNumberMatch.length > 0 ? idNumberMatch[0] : 0;
+            var mark = +commentIdToScore[idNumber] || 0;
+
 			var isNew = item.querySelector(".tm-comment__header_is-new") != null;
 			var userInfoElement = item.querySelector(".tm-user-info__username");
 			var userInfoHref = userInfoElement ? userInfoElement.getAttribute("href") : "";
