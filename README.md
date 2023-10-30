@@ -18,4 +18,4 @@
 
 # Скачать
 
-[habr-best-comments.user.js](https://bitbucket.org/liiws/habr-best-comments/downloads/habr-best-comments.user.js).
+[habr-best-comments.user.js](https://github.com/liiws/habr-best-comments/releases/download/release/habr-best-comments.user.js).

@@ -1,6 +1,8 @@
 // ==UserScript==
 // @name        habr-best-comments
 // @namespace   http://habr.com
+// @include     https://habr.com/ru/*
+// @include     https://habr.com/en/*
 // @include     https://habr.com/ru/post/*
 // @include     https://habr.com/ru/company/*
 // @include     https://habr.com/ru/article/*
