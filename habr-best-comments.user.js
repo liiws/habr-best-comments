@@ -19,7 +19,7 @@
 // @include     https://habr.com/en/news/*
 // @grant       none
 // @run-at      document-start
-// @version     1.0.29
+// @version     1.0.30
 // @downloadURL https://github.com/liiws/habr-best-comments/releases/download/release/habr-best-comments.user.js
 // @updateURL   https://github.com/liiws/habr-best-comments/releases/download/release/habr-best-comments.meta.js
 // ==/UserScript==
@@ -130,6 +130,12 @@ function ProcessComments() {
     var storedOptions = JSON.parse(storedOptionsJson);
 
 	// options
+    // example of how to set in developer console:
+    // window.localStorage["habr-best-comments-options"] = '{ "panelOpacityPc": 50 }'
+    // how to reset:
+    // window.localStorage.removeItem("habr-best-comments-options")
+    // or
+    // window.localStorage["habr-best-comments-options"] = '{}'
 	var _fgAuthor = storedOptions.fgAuthor || '#F76D59';
 	var _bgAuthor = storedOptions.bgAuthor || '#FFAA9D';
 	var _fgPositiveMark = storedOptions.fgPositiveMark || '#339900';
@@ -147,6 +153,7 @@ function ProcessComments() {
     var _hideLowRatingCommentsBelow = storedOptions.hideLowRatingCommentsBelow || -10;
     var _preserveExtraLowRatingComments = storedOptions.preserveExtraLowRatingComments || false;
     var _preserveExtraLowRatingCommentsBelow = storedOptions.preserveExtraLowRatingCommentsBelow || -30;
+    var _panelOpacityPc = storedOptions.panelOpacityPc || 100;
 
 
 	var authorElement = document.querySelector(".tm-user-info__username");
@@ -237,7 +244,7 @@ function ProcessComments() {
 
         var wnd = document.createElement("div");
         wnd.className = "hbc";
-        wnd.style = "width: 80px; top: 55px; bottom: 10px; right: 49px; overflow: auto; position: fixed; z-index: 999; line-height: 1.1em; font-size: 15px; background-color: " + _bgColor;
+        wnd.style = "width: 80px; top: 55px; bottom: 10px; right: 49px; overflow: auto; position: fixed; z-index: 999; line-height: 1.1em; font-size: 15px; background-color: " + _bgColor + "; opacity: " + _panelOpacityPc + "%";
 		document.body.appendChild(wnd);
 		comments.forEach(comment => {
 
