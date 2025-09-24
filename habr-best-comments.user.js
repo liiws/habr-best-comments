@@ -19,7 +19,7 @@
 // @include     https://habr.com/en/news/*
 // @grant       none
 // @run-at      document-start
-// @version     1.0.30
+// @version     1.0.31
 // @downloadURL https://github.com/liiws/habr-best-comments/releases/download/release/habr-best-comments.user.js
 // @updateURL   https://github.com/liiws/habr-best-comments/releases/download/release/habr-best-comments.meta.js
 // ==/UserScript==
@@ -78,7 +78,9 @@ function Run() {
 }
 
 function GetCommentsSection() {
-    return document.querySelector(".tm-article-page-comments") || document.querySelector(".tm-page-article__comments") || document.querySelector(".tm-article-comments");
+    return document.querySelector(".tm-article-page-comments")
+        || document.querySelector(".tm-page-article__comments")
+        || document.querySelector(".tm-article-comments");
 }
 
 function ObserveComments() {
@@ -292,8 +294,12 @@ function ProcessComments() {
 		});
 
         if (comments.length == 0) {
-            var commentCountElement = commentsSection.querySelector(".tm-article-comments-counter-link__value") || commentsSection.querySelector(".tm-comments__comments-count") || commentsSection.querySelector(".tm-comments-wrapper__comments-count");
-            var commentsCount = commentCountElement.innerText.match(/\d+/)[0];
+            var commentCountElement = document.querySelector(".tm-article-page-comments")
+                || document.querySelector(".tm-article-comments-counter-link__value")
+                || document.querySelector(".tm-comments__comments-count")
+                || document.querySelector(".tm-comments-wrapper__comments-count")
+                || document.querySelector(".tm-article-page-comments");
+            var commentsCount = !commentCountElement ? "???" : commentCountElement.innerText.match(/\d+/)[0];
 
 			// create item
             var item = document.createElement("div");

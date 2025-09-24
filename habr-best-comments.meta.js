@@ -13,7 +13,7 @@
 // @include     https://habr.com/en/news/*
 // @grant       none
 // @run-at      document-start
-// @version     1.0.30
+// @version     1.0.31
 // @downloadURL https://github.com/liiws/habr-best-comments/releases/download/release/habr-best-comments.user.js
 // @updateURL   https://github.com/liiws/habr-best-comments/releases/download/release/habr-best-comments.meta.js
 // ==/UserScript==
