@@ -19,7 +19,7 @@
 // @include     https://habr.com/en/news/*
 // @grant       none
 // @run-at      document-start
-// @version     1.0.31
+// @version     1.1.0
 // @downloadURL https://github.com/liiws/habr-best-comments/releases/download/release/habr-best-comments.user.js
 // @updateURL   https://github.com/liiws/habr-best-comments/releases/download/release/habr-best-comments.meta.js
 // ==/UserScript==
@@ -131,6 +131,9 @@ function ProcessComments() {
     var storedOptionsJson = window.localStorage.getItem("habr-best-comments-options") || "{}";
     var storedOptions = JSON.parse(storedOptionsJson);
 
+    var themeLink = [...document.querySelectorAll("link[rel=preload][as=style]")].find(r => r.href.indexOf("theme") != -1);
+    var isThemeLight = themeLink && themeLink.href && themeLink.href.indexOf("dark") == -1;
+
 	// options
     // example of how to set in developer console:
     // window.localStorage["habr-best-comments-options"] = '{ "panelOpacityPc": 50 }'
@@ -138,19 +141,19 @@ function ProcessComments() {
     // window.localStorage.removeItem("habr-best-comments-options")
     // or
     // window.localStorage["habr-best-comments-options"] = '{}'
-	var _fgAuthor = storedOptions.fgAuthor || '#F76D59';
-	var _bgAuthor = storedOptions.bgAuthor || '#FFAA9D';
-	var _fgPositiveMark = storedOptions.fgPositiveMark || '#339900';
-	var _fgNegativeMark = storedOptions.fgNegativeMark || '#CC0000';
-	var _fgZeroMark = storedOptions.fgZeroMark || '#548EAA';
-	var _bgColor = storedOptions.bgColor || '#F8F8F8';
-	var _bgColorNew = storedOptions.bgColorNew || '#E8E8FF';
-	var _bgColorSelected = storedOptions.bgColorSelected || '#3D438D';
+	var _fgAuthor = SelectColor(isThemeLight, storedOptions.fgAuthor, '#F76D59', '#CB220A');
+	var _bgAuthor = SelectColor(isThemeLight, storedOptions.bgAuthor, '#FFAA9D', '#660D00');
+	var _fgPositiveMark = SelectColor(isThemeLight, storedOptions.fgPositiveMark, '#339900', '#A5FF79');
+	var _fgNegativeMark = SelectColor(isThemeLight, storedOptions.fgNegativeMark, '#CC0000', '#FF3E3E');
+	var _fgZeroMark = SelectColor(isThemeLight, storedOptions.fgZeroMark, '#548EAA', '#6A9CB5');
+	var _bgColor = SelectColor(isThemeLight, storedOptions.bgColor, '#F8F8F8', '#303030');
+	var _bgColorNew = SelectColor(isThemeLight, storedOptions.bgColorNew, '#E8E8FF', '##000091');
+	var _bgColorSelected = SelectColor(isThemeLight, storedOptions.bgColorSelected, '#3D438D', '#9599D0');
 	var _highlightIntervalMs = storedOptions.highlightIntervalMs || 1500;
 	var _scrollTopOffsetPc = storedOptions.scrollTopOffsetPc || 0.2;
-	var _fgMedia = storedOptions.fgMedia || '#0000FF';
-	var _fgLink = storedOptions.fgLink || '#366804';
-    var _bgHighlight = storedOptions.bgHighlight || 'yellow';
+	var _fgMedia = SelectColor(isThemeLight, storedOptions.fgMedia, '#0000FF', '#0000FF');
+	var _fgLink = SelectColor(isThemeLight, storedOptions.fgLink, '#366804', '#D3FCAB');
+    var _bgHighlight = SelectColor(isThemeLight, storedOptions.bgHighlight, '#FFFF00', '#797900');
     var _hideLowRatingComments = storedOptions.hideLowRatingComments || false;
     var _hideLowRatingCommentsBelow = storedOptions.hideLowRatingCommentsBelow || -10;
     var _preserveExtraLowRatingComments = storedOptions.preserveExtraLowRatingComments || false;
@@ -163,6 +166,21 @@ function ProcessComments() {
 
     ShowCommentsPanel();
 
+
+    function SelectColor(isThemeLight, savedColor, lightColor, darkColor) {
+        if (savedColor) {
+            if (isThemeLight && savedColor == darkColor) {
+                return lightColor;
+            }
+            if (!isThemeLight && savedColor == lightColor) {
+                return darkColor;
+            }
+            return savedColor;
+        }
+        else {
+            return isThemeLight ? lightColor : darkColor;
+        }
+    }
 
 	function ShowCommentsPanel() {
 		var allComments = GetAllComments();
