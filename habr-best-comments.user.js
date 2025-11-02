@@ -19,7 +19,7 @@
 // @include     https://habr.com/en/news/*
 // @grant       none
 // @run-at      document-start
-// @version     1.1.0
+// @version     1.1.1
 // @downloadURL https://github.com/liiws/habr-best-comments/releases/download/release/habr-best-comments.user.js
 // @updateURL   https://github.com/liiws/habr-best-comments/releases/download/release/habr-best-comments.meta.js
 // ==/UserScript==
@@ -131,8 +131,16 @@ function ProcessComments() {
     var storedOptionsJson = window.localStorage.getItem("habr-best-comments-options") || "{}";
     var storedOptions = JSON.parse(storedOptionsJson);
 
-    var themeLink = [...document.querySelectorAll("link[rel=preload][as=style]")].find(r => r.href.indexOf("theme") != -1);
-    var isThemeLight = themeLink && themeLink.href && themeLink.href.indexOf("dark") == -1;
+    var isThemeLight = true;
+    var themeLinks = [...document.querySelectorAll("link[rel=preload][as=style]")].filter(r => r.href.indexOf("theme") != -1);
+    if (themeLinks.length == 1) {
+        isThemeLight = themeLinks[0].href && themeLinks[0].href.indexOf("dark") == -1;
+    }
+    else if (themeLinks.length > 1) {
+        if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+            isThemeLight = false;
+        }
+    }
 
 	// options
     // example of how to set in developer console:
